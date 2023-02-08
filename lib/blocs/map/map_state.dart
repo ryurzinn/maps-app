@@ -9,6 +9,7 @@ part of 'map_bloc.dart';
   // PolyLines
 
   final Map<String, Polyline> polylines;
+  final Map<String, Marker> markers;
   /**
     mi_ruta: {
     id: polylineID google
@@ -19,11 +20,13 @@ part of 'map_bloc.dart';
    */
 
   const MapState({
-     this.isMapIntialized = false,
+    this.isMapIntialized = false,
      this.isFollowingUser = true,
      this.showMyRoute = true,
-     final Map<String, Polyline>? polylines
-    }): polylines = polylines ?? const {};
+     final Map<String, Polyline>? polylines,
+     final Map<String, Marker>? markers
+    }): polylines = polylines ?? const {},
+        markers = markers ?? const {};
 
 
 
@@ -31,19 +34,21 @@ part of 'map_bloc.dart';
     bool? isMapIntialized,
     bool? isFollowingUser,
     bool? showMyRoute,
-    final Map<String, Polyline>? polylines
+    final Map<String, Polyline>? polylines,
+    final Map<String, Marker>? markers
   }) 
   => MapState(
    isFollowingUser: isFollowingUser ?? this.isFollowingUser,
    isMapIntialized: isMapIntialized ?? this.isMapIntialized,
    showMyRoute: showMyRoute ?? this.showMyRoute,
    polylines: polylines ?? this.polylines,
+   markers: markers ?? this.markers,
 
 
   );
   
   @override
-  List<Object> get props => [isMapIntialized, isFollowingUser, polylines, showMyRoute];
+  List<Object> get props => [isMapIntialized, isFollowingUser, polylines, showMyRoute, markers];
 }
 
 

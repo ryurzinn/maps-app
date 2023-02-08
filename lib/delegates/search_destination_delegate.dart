@@ -1,7 +1,10 @@
 
 
+import 'dart:js_util';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:maps_app/blocs/blocs.dart';
 import 'package:maps_app/models/models.dart';
 
@@ -39,28 +42,68 @@ class SearchDestinationDelegate extends SearchDelegate<SearchResult>{
 
     return BlocBuilder<SearchBloc, SearchState>(
       builder: (context, state) {
-        return const Text('Aca iran los resultados');
+        final places = state.places;
+        return ListView.separated(
+         itemBuilder: (context, i){
+          final place = places[i];
+          return ListTile(
+            title: Text(place.text),
+            subtitle: Text(place.placeName),
+            leading: const Icon(Icons.place_outlined, color: Colors.black,),
+            onTap: (() {
+              print('enviar este lugar $place');
+              final result = SearchResult(
+                cancel: false,
+                manual: false,
+                position: LatLng(place.center[1], place.center[0]),
+                name: place.text,
+                description: place.placeName
+                 );
+
+              searchBloc.add(AddToHistoryEvent(place));
+
+              close(context, result );
+            }),
+          );
+         },
+         separatorBuilder: (context, i) => const Divider(),
+         itemCount: places.length
+         );
       },
     );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    final history = BlocProvider.of<SearchBloc>(context).state.history;
+
    return ListView(
     children: [
        ListTile(
           leading: const Icon( Icons.location_on_outlined, color: Colors.black ),
           title: const Text('Colocar la ubicación manualmente', style: TextStyle( color: Colors.black )),
           onTap: () {
-            // TODO: regresar algo...
-
-
             final result = SearchResult( cancel: false, manual: true );
             close(context, result );
-        },
-        
+        }, 
        
-      )
+      ),
+
+    ...history.map((place) => ListTile(
+      title: Text(place.text),
+      subtitle: Text(place.placeName),
+      leading: const Icon(Icons.history, color: Colors.black),
+      onTap: () {
+          final result = SearchResult(
+          cancel: false,
+          manual: false,
+          position: LatLng(place.center[1], place.center[0]),
+          name: place.text,
+          description: place.placeName
+            );
+          close(context, result);
+      },
+    ))
     ],
    );
   }
